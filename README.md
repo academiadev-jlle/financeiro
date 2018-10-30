@@ -1,23 +1,11 @@
-# Financeiro-API
+# Financeiro API  
 
-Exercício colaborativo.
+## Heroku
 
-# Entidades
-
-## Usuario
-- id
-- nome
-- email
-- senha
-
-## LancamentoFinanceiro
-
-- id
-- usuario
-- valor
-- tipoLancamento { PAGAR, RECEBER }
-- status { PAGO, PENDENTE }
-- dataEmissao,
-- dataVencimento,
-- dataInclusao,
-- recebedorPagador
+Link [aqui](https://lonewolfapp.herokuapp.com/swagger-ui.html#/).
+  
+## Swagger  
+  
+![enter image description here](https://imageshack.com/a/img921/3294/3bUziL.png)
+  
+ 
