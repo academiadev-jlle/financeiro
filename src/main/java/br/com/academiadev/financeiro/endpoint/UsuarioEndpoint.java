@@ -2,36 +2,54 @@ package br.com.academiadev.financeiro.endpoint;
 
 import br.com.academiadev.financeiro.model.Usuario;
 import br.com.academiadev.financeiro.repository.UsuarioRepository;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @RestController
-@RequestMapping
+@RequestMapping(value = "/usuario")
+@Api(description = "Usuários")
 public class UsuarioEndpoint {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioRepository repository;
 
-    @PostMapping("/usuario")
-    public void save(@RequestBody Usuario usuario) {
-        usuarioRepository.save(usuario);
+    @ApiOperation(value = "Cria um usuário")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Lançamento criado com sucesso")
+    })
+    @PostMapping
+    public void criar(@RequestBody Usuario usuario) {
+        repository.save(usuario);
     }
 
-    @GetMapping("/usuario")
-    public List<Usuario> buscarUsuarios() {
-        return toList(usuarioRepository.findAll());
+    @ApiOperation(value = "Retorna uma lista de usuários")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Usuários retornados com sucesso")
+    })
+    @GetMapping
+    public List<Usuario> buscarTodos() {
+        return repository.findAll();
     }
 
-    public <E> List<E> toList(Iterable<E> iterable) {
-        return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
+    @ApiOperation(value = "Retorna um usuário")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Usuário encontrado com sucesso")
+    })
+    @GetMapping("/{id}")
+    public Usuario buscarPor(@PathVariable Long id) {
+        return repository.findById(id).orElse(null);
     }
 
-    @DeleteMapping("/usuarios")
-    public void delete(Long idUsuario) {
-        usuarioRepository.deleteById(idUsuario);
+
+    @ApiOperation(value = "Deleta um usuário")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Usuário deletado com sucesso")
+    })
+    @DeleteMapping("/{id}")
+    public void deletar(@PathVariable Long id) {
+        repository.deleteById(id);
     }
 }

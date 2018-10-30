@@ -1,34 +1,58 @@
 package br.com.academiadev.financeiro.endpoint;
 
 import br.com.academiadev.financeiro.model.LancamentoFinanceiro;
-import br.com.academiadev.financeiro.service.UsuarioService;
+import br.com.academiadev.financeiro.repository.LancamentoFinanceiroRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @RestController
+@RequestMapping("/lancamentofinanceiro")
+@Api(description = "Lançamentos Financeiros")
 public class LancamentoFinanceiroEndpoint {
 
     @Autowired
-    private UsuarioService service;
+    private LancamentoFinanceiroRepository repository;
 
-
-    @GetMapping("/lancamentofinanceiro")
-    public List<LancamentoFinanceiro> getLancamentosFinanceiros() {
-        return StreamSupport.stream(service.getLancamentoFinanceiroRepository().findAll().spliterator(), false).collect(Collectors.toList());
+    @ApiOperation(value = "Retorna uma lista de lançamentos")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Lançamentos retornados com sucesso")
+    })
+    @GetMapping
+    public List<LancamentoFinanceiro> buscarTodos() {
+        return repository.findAll();
     }
 
-    @PostMapping("/lancamentofinanceiro")
-    public LancamentoFinanceiro create(@RequestBody LancamentoFinanceiro lancamentoFinanceiro) {
-        return service.getLancamentoFinanceiroRepository().save(lancamentoFinanceiro);
+    @ApiOperation(value = "Retorna um lançamento financeiro")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Lançamento financeiro encontrado com sucesso")
+    })
+    @GetMapping("/{id}")
+    public List<LancamentoFinanceiro> buscarPor(@PathVariable Long id) {
+        return repository.findAll();
     }
 
-    @DeleteMapping("/lancamentofinanceiro")
-    public void delete(Long idLancamentoFinanceiro) {
-        service.remove(idLancamentoFinanceiro);
+    @ApiOperation(value = "Cria um lançamento financeiro")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Lançamento criado com sucesso")
+    })
+    @PostMapping
+    public LancamentoFinanceiro criar(@RequestBody LancamentoFinanceiro lancamento) {
+        return repository.save(lancamento);
+    }
+
+    @ApiOperation(value = "Deleta um lançamento financeiro")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Lançamento deletado com sucesso")
+    })
+    @DeleteMapping("/{id}")
+    public void deletar(@PathVariable Long id) {
+        repository.deleteById(id);
     }
 
 

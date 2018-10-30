@@ -2,8 +2,8 @@ package br.com.academiadev.financeiro.endpoint;
 
 
 import br.com.academiadev.financeiro.model.LancamentoFinanceiro;
-import br.com.academiadev.financeiro.model.Status;
-import br.com.academiadev.financeiro.model.TipoLancamento;
+import br.com.academiadev.financeiro.enums.Status;
+import br.com.academiadev.financeiro.enums.TipoLancamento;
 import br.com.academiadev.financeiro.model.Usuario;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;

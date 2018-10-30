@@ -12,6 +12,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "net.ltgt.apt" version "0.13"
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
@@ -27,15 +31,18 @@ repositories {
     maven { url "https://repo.spring.io/milestone" }
 }
 
-
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation('org.springframework.boot:spring-boot-starter-web')
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
 
-    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
-    compile group: 'javax.xml', name: 'jaxb-api', version: '2.1'
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    implementation group: 'javax.xml', name: 'jaxb-api', version: '2.1'
+
+    apt ('org.projectlombok:lombok:1.18.2')
 
     runtimeOnly('com.h2database:h2')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
+
 }
