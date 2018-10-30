@@ -8,6 +8,7 @@ import br.com.academiadev.financeiro.model.Usuario;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ public class LancamentoFinanceiroEndpointTest {
     @Autowired
     private MockMvc mvc;
 
+    @Ignore
     @Test
     @Transactional
     public void lancamentoFinceniroTest() throws Exception {
