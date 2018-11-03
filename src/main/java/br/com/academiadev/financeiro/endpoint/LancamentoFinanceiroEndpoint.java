@@ -34,7 +34,6 @@ public class LancamentoFinanceiroEndpoint {
 
 		LancamentoFinanceiro lancamento = new LancamentoFinanceiro();
 		lancamento.setId(id);
-		lancamento.setDataCriacao(null);
 
 		return repository.findAll(Example.of(lancamento));
 	}

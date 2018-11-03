@@ -5,14 +5,12 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,12 +18,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @ApiModel(description = "Usuário")
 @Entity
-public class Usuario {
-
-    @Id
-    @GeneratedValue
-    @ApiModelProperty(example = "1", name = "Identificador")
-    private Long id;
+public class Usuario extends EntidadeAuditavel<Long> {
 
     @NotNull()
     @Size(min = 3, max = 120)
@@ -41,15 +34,6 @@ public class Usuario {
     @Size(min = 6, max = 16)
     @ApiModelProperty(example = "123456", name = "Senha")
     private String senha;
-
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    @ApiModelProperty(hidden = true)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @ApiModelProperty(hidden = true)
-    private LocalDateTime updatedAt;
 
     public Usuario(Long id) {
         this.id = id;

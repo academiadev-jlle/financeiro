@@ -1,21 +1,17 @@
 package br.com.academiadev.financeiro.endpoint;
 
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.io.IOException;
-import java.time.LocalDate;
-
-import javax.transaction.Transactional;
-
-import org.junit.Ignore;
+import br.com.academiadev.financeiro.enums.Status;
+import br.com.academiadev.financeiro.enums.TipoLancamento;
+import br.com.academiadev.financeiro.model.LancamentoFinanceiro;
+import br.com.academiadev.financeiro.model.Usuario;
+import br.com.academiadev.financeiro.repository.UsuarioRepository;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,14 +20,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import javax.transaction.Transactional;
+import java.io.IOException;
+import java.time.LocalDate;
 
-import br.com.academiadev.financeiro.enums.Status;
-import br.com.academiadev.financeiro.enums.TipoLancamento;
-import br.com.academiadev.financeiro.model.LancamentoFinanceiro;
-import br.com.academiadev.financeiro.model.Usuario;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
@@ -41,7 +39,10 @@ public class LancamentoFinanceiroEndpointTest {
     @Autowired
     private MockMvc mvc;
 
-    @Ignore
+    @Mock
+    private UsuarioRepository repository;
+
+
     @Test
     @Transactional
     public void lancamentoFinceniroTest() throws Exception {
@@ -58,9 +59,8 @@ public class LancamentoFinanceiroEndpointTest {
         lancamentoFinanceiro.setStatus(Status.PENDENTE);
         lancamentoFinanceiro.setTipolancamento(TipoLancamento.PAGAR);
         lancamentoFinanceiro.setUsuario(new Usuario(1l));
-        lancamentoFinanceiro.setDataCriacao(LocalDate.of(2018, 10, 10));
         lancamentoFinanceiro.setDataVencimento(LocalDate.of(2018, 10, 20));
-        ResultActions post = mvc.perform(post("/lancamentofinanceiro").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(convertObjectToJsonBytes(usuario))).andExpect(status().isOk());
+        ResultActions post = mvc.perform(post("/lancamentofinanceiro").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(convertObjectToJsonBytes(lancamentoFinanceiro))).andExpect(status().isOk());
     }
 
     private Usuario getUsuario() {

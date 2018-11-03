@@ -1,0 +1,20 @@
+package br.com.academiadev.financeiro.model;
+
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+
+@Data
+@MappedSuperclass
+public class Entidade<ID> implements AbstractEntity<ID> {
+
+    @Id
+    @GeneratedValue
+    @ApiModelProperty(example = "1", name = "Identificador")
+    protected ID id;
+
+}

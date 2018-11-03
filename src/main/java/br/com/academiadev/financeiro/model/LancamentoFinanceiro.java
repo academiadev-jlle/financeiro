@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class LancamentoFinanceiro {
+public class LancamentoFinanceiro extends EntidadeAuditavel<Long> {
 
     @Id
     @GeneratedValue
@@ -40,16 +40,12 @@ public class LancamentoFinanceiro {
     private Status status;
 
     @NotNull
-    @ApiModelProperty( name = "Data de Emissão", example = "01/01/2018")
+    @ApiModelProperty(name = "Data de Emissão", example = "01/01/2018")
     private LocalDate dataEmissao;
 
     @NotNull
     @ApiModelProperty(name = "Data de Vencimento", example = "01/01/2018")
     private LocalDate dataVencimento;
-
-    @NotNull
-    @ApiModelProperty(name = "Data de Criação", example = "01/01/2018")
-    private LocalDate dataCriacao;
 
     @NotNull
     @Size(min = 1, max = 120)

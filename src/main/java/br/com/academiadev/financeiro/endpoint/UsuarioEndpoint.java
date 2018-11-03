@@ -1,6 +1,7 @@
 package br.com.academiadev.financeiro.endpoint;
 
 import br.com.academiadev.financeiro.dto.UsuarioDTO;
+import br.com.academiadev.financeiro.mapper.UsuarioMapper;
 import br.com.academiadev.financeiro.model.Usuario;
 import br.com.academiadev.financeiro.repository.UsuarioRepository;
 import io.swagger.annotations.Api;
@@ -8,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +22,9 @@ public class UsuarioEndpoint {
 
     @Autowired
     private UsuarioRepository repository;
+
+    @Autowired
+    private UsuarioMapper mapper;
 
     @ApiOperation(value = "Cria um usuário")
     @ApiResponses(value = {
@@ -45,7 +50,8 @@ public class UsuarioEndpoint {
         usuarioExample.setEmail(email.orElse(null));
         usuarioExample.setNome(nome.orElse(null));
 
-        return null;
+        List<Usuario> lista = repository.findAll(Example.of(usuarioExample));
+        return mapper.toDTO(lista);
     }
 
     @ApiOperation(value = "Retorna um usuário")

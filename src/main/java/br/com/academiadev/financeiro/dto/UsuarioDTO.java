@@ -9,7 +9,7 @@ public class UsuarioDTO {
     private String nome;
     private String email;
     private String senha;
-    private String createdAt;
+    private String created_at;
     private String updatedAt;
 
 }
