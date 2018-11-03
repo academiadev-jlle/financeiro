@@ -4,12 +4,11 @@ import br.com.academiadev.financeiro.dto.UsuarioDTO;
 import br.com.academiadev.financeiro.mapper.UsuarioMapper;
 import br.com.academiadev.financeiro.model.Usuario;
 import br.com.academiadev.financeiro.repository.UsuarioRepository;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,11 +38,17 @@ public class UsuarioEndpoint {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Usuários retornados com sucesso")
     })
+    @ApiImplicitParams({ //
+            @ApiImplicitParam(name = "Authorization", value = "Authorization token", required = true, dataType = "string", paramType = "header") //
+    })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public List<UsuarioDTO> buscarTodos(
             @RequestParam(required = false) Optional<Long> id,
             @RequestParam(required = false) Optional<String> nome,
             @RequestParam(required = false) Optional<String> email) {
+
+        Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Usuario usuarioExample = new Usuario();
         usuarioExample.setId(id.orElse(null));
