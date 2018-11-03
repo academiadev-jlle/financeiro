@@ -3,12 +3,11 @@ package br.com.academiadev.financeiro.endpoint;
 import br.com.academiadev.financeiro.dto.UsuarioDTO;
 import br.com.academiadev.financeiro.mapper.UsuarioMapper;
 import br.com.academiadev.financeiro.model.Usuario;
-import br.com.academiadev.financeiro.repository.UsuarioRepository;
+import br.com.academiadev.financeiro.service.UsuarioService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.Optional;
 public class UsuarioEndpoint {
 
     @Autowired
-    private UsuarioRepository repository;
+    private UsuarioService usuarioService;
 
     @Autowired
     private UsuarioMapper mapper;
@@ -31,7 +30,7 @@ public class UsuarioEndpoint {
     })
     @PostMapping
     public void criar(@RequestBody Usuario usuario) {
-        repository.save(usuario);
+        usuarioService.save(usuario);
     }
 
     @ApiOperation(value = "Retorna uma lista de usuários")
@@ -48,15 +47,12 @@ public class UsuarioEndpoint {
             @RequestParam(required = false) Optional<String> nome,
             @RequestParam(required = false) Optional<String> email) {
 
-        Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         Usuario usuarioExample = new Usuario();
         usuarioExample.setId(id.orElse(null));
         usuarioExample.setEmail(email.orElse(null));
         usuarioExample.setNome(nome.orElse(null));
 
-        List<Usuario> lista = repository.findAll(Example.of(usuarioExample));
-        return mapper.toDTO(lista);
+        return mapper.toDTO(usuarioService.findAll(Example.of(usuarioExample)));
     }
 
     @ApiOperation(value = "Retorna um usuário")
@@ -65,7 +61,7 @@ public class UsuarioEndpoint {
     })
     @GetMapping("/{id}")
     public Usuario buscarPor(@PathVariable Long id) {
-        return repository.findById(id).orElse(null);
+        return usuarioService.findById(id).orElse(null);
     }
 
 
@@ -75,6 +71,6 @@ public class UsuarioEndpoint {
     })
     @DeleteMapping("/{id}")
     public void deletar(@PathVariable Long id) {
-        repository.deleteById(id);
+        usuarioService.deleteById(id);
     }
 }
