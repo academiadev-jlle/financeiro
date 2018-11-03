@@ -1,13 +1,18 @@
 package br.com.academiadev.financeiro.endpoint;
 
 
-import br.com.academiadev.financeiro.model.LancamentoFinanceiro;
-import br.com.academiadev.financeiro.enums.Status;
-import br.com.academiadev.financeiro.enums.TipoLancamento;
-import br.com.academiadev.financeiro.model.Usuario;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.time.LocalDate;
+
+import javax.transaction.Transactional;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,16 +24,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import javax.transaction.Transactional;
-import java.io.IOException;
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import br.com.academiadev.financeiro.enums.Status;
+import br.com.academiadev.financeiro.enums.TipoLancamento;
+import br.com.academiadev.financeiro.model.LancamentoFinanceiro;
+import br.com.academiadev.financeiro.model.Usuario;
 
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
