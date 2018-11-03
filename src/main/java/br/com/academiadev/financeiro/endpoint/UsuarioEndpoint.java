@@ -1,12 +1,17 @@
 package br.com.academiadev.financeiro.endpoint;
 
+import br.com.academiadev.financeiro.dto.UsuarioDTO;
 import br.com.academiadev.financeiro.model.Usuario;
 import br.com.academiadev.financeiro.repository.UsuarioRepository;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/usuario")
@@ -30,8 +35,17 @@ public class UsuarioEndpoint {
             @ApiResponse(code = 201, message = "Usuários retornados com sucesso")
     })
     @GetMapping
-    public List<Usuario> buscarTodos() {
-        return repository.findAll();
+    public List<UsuarioDTO> buscarTodos(
+            @RequestParam(required = false) Optional<Long> id,
+            @RequestParam(required = false) Optional<String> nome,
+            @RequestParam(required = false) Optional<String> email) {
+
+        Usuario usuarioExample = new Usuario();
+        usuarioExample.setId(id.orElse(null));
+        usuarioExample.setEmail(email.orElse(null));
+        usuarioExample.setNome(nome.orElse(null));
+
+        return null;
     }
 
     @ApiOperation(value = "Retorna um usuário")
