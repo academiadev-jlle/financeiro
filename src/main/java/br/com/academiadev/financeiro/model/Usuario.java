@@ -1,6 +1,5 @@
 package br.com.academiadev.financeiro.model;
 
-import br.com.academiadev.financeiro.enums.Autorizacao;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -14,9 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -47,9 +44,7 @@ public class Usuario extends EntidadeAuditavel<Long> implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> list = new ArrayList<>();
-        list.add(Autorizacao.ROLE_USER);
-        return list;
+        return null;
     }
 
     @Override

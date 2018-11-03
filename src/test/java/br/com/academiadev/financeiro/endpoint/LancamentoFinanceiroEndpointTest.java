@@ -1,24 +1,27 @@
 package br.com.academiadev.financeiro.endpoint;
 
-
+import br.com.academiadev.financeiro.FinanceiroApplication;
 import br.com.academiadev.financeiro.enums.Status;
 import br.com.academiadev.financeiro.enums.TipoLancamento;
 import br.com.academiadev.financeiro.model.LancamentoFinanceiro;
 import br.com.academiadev.financeiro.model.Usuario;
-import br.com.academiadev.financeiro.repository.UsuarioRepository;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
@@ -28,31 +31,50 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = FinanceiroApplication.class)
 public class LancamentoFinanceiroEndpointTest {
 
     @Autowired
     private MockMvc mvc;
 
-    @Mock
-    private UsuarioRepository repository;
+    @Value("${security.oauth2.client.client-id}")
+    private String CLIENT_ID;
 
+    @Value("${security.oauth2.client.client-secret}")
+    private String CLIENT_SECRET;
 
     @Test
     @Transactional
     public void lancamentoFinceniroTest() throws Exception {
         Usuario usuario = getUsuario();
-        ResultActions performCreate = mvc.perform(post("/usuario").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(convertObjectToJsonBytes(usuario))).andExpect(status().isOk());
 
-        ResultActions performGET = mvc.perform(get("/usuario").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
-        performGET.andExpect(jsonPath("$[0].nome", is("Augusto da Silva")));
-        performGET.andExpect(jsonPath("$[0].email", is("docsbruno@gmail.com")));
+        mvc.perform(post("/usuario")
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .content(convertObjectToJsonBytes(usuario)))
+                .andExpect(status().isOk());
 
+        mvc.perform(get("/usuario")
+                .header("Authorization", "Bearer " + getToken("docsbruno@gmail.com", "123456"))
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].nome", is("Augusto da Silva")))
+                .andExpect(jsonPath("$[0].email", is("docsbruno@gmail.com")));
+
+        LancamentoFinanceiro lancamentoFinanceiro = getLancamentoFinanceiro();
+
+        mvc.perform(post("/lancamentofinanceiro")
+                .header("Authorization", "Bearer " + getToken("docsbruno@gmail.com", "1234567"))
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .content(convertObjectToJsonBytes(lancamentoFinanceiro)))
+                .andExpect(status().isOk());
+    }
+
+    private LancamentoFinanceiro getLancamentoFinanceiro() {
         LancamentoFinanceiro lancamentoFinanceiro = new LancamentoFinanceiro();
         lancamentoFinanceiro.setRecebedorPagador("Casas Bahia");
         lancamentoFinanceiro.setDataEmissao(LocalDate.of(2018, 10, 10));
@@ -60,7 +82,7 @@ public class LancamentoFinanceiroEndpointTest {
         lancamentoFinanceiro.setTipolancamento(TipoLancamento.PAGAR);
         lancamentoFinanceiro.setUsuario(new Usuario(1l));
         lancamentoFinanceiro.setDataVencimento(LocalDate.of(2018, 10, 20));
-        ResultActions post = mvc.perform(post("/lancamentofinanceiro").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(convertObjectToJsonBytes(lancamentoFinanceiro))).andExpect(status().isOk());
+        return lancamentoFinanceiro;
     }
 
     private Usuario getUsuario() {
@@ -79,5 +101,26 @@ public class LancamentoFinanceiroEndpointTest {
         mapper.registerModule(module);
 
         return mapper.writeValueAsBytes(object);
+    }
+
+    private String getToken(String username, String password) throws Exception {
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "password");
+        params.add("username", username);
+        params.add("password", password);
+
+        ResultActions result
+                = mvc.perform(post("/oauth/token")
+                .params(params)
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic(CLIENT_ID, CLIENT_SECRET))
+                .accept("application/json;charset=UTF-8"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"));
+
+        String resultString = result.andReturn().getResponse().getContentAsString();
+
+        JacksonJsonParser jsonParser = new JacksonJsonParser();
+        return jsonParser.parseMap(resultString).get("access_token").toString();
     }
 }
