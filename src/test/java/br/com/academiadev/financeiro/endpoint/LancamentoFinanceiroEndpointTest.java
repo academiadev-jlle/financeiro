@@ -1,13 +1,19 @@
 package br.com.academiadev.financeiro.endpoint;
 
-import br.com.academiadev.financeiro.FinanceiroApplication;
-import br.com.academiadev.financeiro.enums.Status;
-import br.com.academiadev.financeiro.enums.TipoLancamento;
-import br.com.academiadev.financeiro.model.LancamentoFinanceiro;
-import br.com.academiadev.financeiro.model.Usuario;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.time.LocalDate;
+
+import javax.transaction.Transactional;
+
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,104 +29,116 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import javax.transaction.Transactional;
-import java.io.IOException;
-import java.time.LocalDate;
+import br.com.academiadev.financeiro.FinanceiroApplication;
+import br.com.academiadev.financeiro.enums.Status;
+import br.com.academiadev.financeiro.enums.TipoLancamento;
+import br.com.academiadev.financeiro.model.LancamentoFinanceiro;
+import br.com.academiadev.financeiro.model.Usuario;
+import br.com.academiadev.financeiro.repository.UsuarioRepository;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FinanceiroApplication.class)
 public class LancamentoFinanceiroEndpointTest {
 
-    @Autowired
-    private MockMvc mvc;
+	@Autowired
+	private MockMvc mvc;
 
-    @Value("${security.oauth2.client.client-id}")
-    private String CLIENT_ID;
+	@Value("${security.oauth2.client.client-id}")
+	private String CLIENT_ID;
 
-    @Value("${security.oauth2.client.client-secret}")
-    private String CLIENT_SECRET;
+	@Value("${security.oauth2.client.client-secret}")
+	private String CLIENT_SECRET;
 
-    @Test
-    @Transactional
-    public void lancamentoFinceniroTest() throws Exception {
-        Usuario usuario = getUsuario();
+	@Autowired
+	private UsuarioRepository repository;
 
-        mvc.perform(post("/usuario")
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .content(convertObjectToJsonBytes(usuario)))
-                .andExpect(status().isOk());
+	@Test
+	@Transactional
+	@Autowired
+	public void loginTest() throws Exception {
+		String token = getToken( "admin@admin.com", "adminadmin" );
+		Assertions.assertThat( token ).isNotNull();
+	}
 
-        mvc.perform(get("/usuario")
-                .header("Authorization", "Bearer " + getToken("docsbruno@gmail.com", "123456"))
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].nome", is("Augusto da Silva")))
-                .andExpect(jsonPath("$[0].email", is("docsbruno@gmail.com")));
+	@Test
+	@Transactional
+	public void lancamentoFinceniroTest() throws Exception {
+		Usuario usuario = getUsuario();
 
-        LancamentoFinanceiro lancamentoFinanceiro = getLancamentoFinanceiro();
+		mvc.perform( post( "/usuario" )
+				.contentType( MediaType.APPLICATION_JSON_UTF8_VALUE )
+				.content( convertObjectToJsonBytes( usuario ) ) )
+				.andExpect( status().isOk() );
 
-        mvc.perform(post("/lancamentofinanceiro")
-                .header("Authorization", "Bearer " + getToken("docsbruno@gmail.com", "1234567"))
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .content(convertObjectToJsonBytes(lancamentoFinanceiro)))
-                .andExpect(status().isOk());
-    }
+		mvc.perform( get( "/usuario" )
+				.header( "Authorization", "Bearer " + getToken( "docsbruno@gmail.com", "123456" ) )
+				.contentType( MediaType.APPLICATION_JSON_UTF8_VALUE ) )
+				.andExpect( status().isOk() )
+				.andExpect( jsonPath( "$", hasSize( 1 ) ) )
+				.andExpect( jsonPath( "$[0].nome", is( "Augusto da Silva" ) ) )
+				.andExpect( jsonPath( "$[0].email", is( "docsbruno@gmail.com" ) ) );
 
-    private LancamentoFinanceiro getLancamentoFinanceiro() {
-        LancamentoFinanceiro lancamentoFinanceiro = new LancamentoFinanceiro();
-        lancamentoFinanceiro.setRecebedorPagador("Casas Bahia");
-        lancamentoFinanceiro.setDataEmissao(LocalDate.of(2018, 10, 10));
-        lancamentoFinanceiro.setStatus(Status.PENDENTE);
-        lancamentoFinanceiro.setTipolancamento(TipoLancamento.PAGAR);
-        lancamentoFinanceiro.setUsuario(new Usuario(1l));
-        lancamentoFinanceiro.setDataVencimento(LocalDate.of(2018, 10, 20));
-        return lancamentoFinanceiro;
-    }
+		LancamentoFinanceiro lancamentoFinanceiro = getLancamentoFinanceiro();
 
-    private Usuario getUsuario() {
-        Usuario usuario = new Usuario();
-        usuario.setNome("Augusto da Silva");
-        usuario.setSenha("123456");
-        usuario.setEmail("docsbruno@gmail.com");
-        return usuario;
-    }
+		mvc.perform( post( "/lancamentofinanceiro" )
+				.header( "Authorization", "Bearer " + getToken( "docsbruno@gmail.com", "1234567" ) )
+				.contentType( MediaType.APPLICATION_JSON_UTF8_VALUE )
+				.content( convertObjectToJsonBytes( lancamentoFinanceiro ) ) )
+				.andExpect( status().isOk() );
+	}
 
-    public static byte[] convertObjectToJsonBytes(Object object) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+	private LancamentoFinanceiro getLancamentoFinanceiro() {
+		LancamentoFinanceiro lancamentoFinanceiro = new LancamentoFinanceiro();
+		lancamentoFinanceiro.setRecebedorPagador( "Casas Bahia" );
+		lancamentoFinanceiro.setDataEmissao( LocalDate.of( 2018, 10, 10 ) );
+		lancamentoFinanceiro.setStatus( Status.PENDENTE );
+		lancamentoFinanceiro.setTipolancamento( TipoLancamento.PAGAR );
+		lancamentoFinanceiro.setUsuario( new Usuario( 1l ) );
+		lancamentoFinanceiro.setDataVencimento( LocalDate.of( 2018, 10, 20 ) );
+		return lancamentoFinanceiro;
+	}
 
-        JavaTimeModule module = new JavaTimeModule();
-        mapper.registerModule(module);
+	private Usuario getUsuario() {
+		Usuario usuario = new Usuario();
+		usuario.setNome( "Augusto da Silva" );
+		usuario.setSenha( "123456" );
+		usuario.setEmail( "docsbruno@gmail.com" );
+		return usuario;
+	}
 
-        return mapper.writeValueAsBytes(object);
-    }
+	public static byte[] convertObjectToJsonBytes(Object object) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL );
 
-    private String getToken(String username, String password) throws Exception {
+		JavaTimeModule module = new JavaTimeModule();
+		mapper.registerModule( module );
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("grant_type", "password");
-        params.add("username", username);
-        params.add("password", password);
+		return mapper.writeValueAsBytes( object );
+	}
 
-        ResultActions result
-                = mvc.perform(post("/oauth/token")
-                .params(params)
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic(CLIENT_ID, CLIENT_SECRET))
-                .accept("application/json;charset=UTF-8"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"));
+	private String getToken(String username, String password) throws Exception {
 
-        String resultString = result.andReturn().getResponse().getContentAsString();
+		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		params.add( "grant_type", "password" );
+		params.add( "username", username );
+		params.add( "password", password );
 
-        JacksonJsonParser jsonParser = new JacksonJsonParser();
-        return jsonParser.parseMap(resultString).get("access_token").toString();
-    }
+		ResultActions result
+				= mvc.perform( post( "/oauth/token" )
+				.params( params )
+				.with( SecurityMockMvcRequestPostProcessors.httpBasic( CLIENT_ID, CLIENT_SECRET ) )
+				.accept( "application/json;charset=UTF-8" ) )
+				.andExpect( status().isOk() )
+				.andExpect( content().contentType( "application/json;charset=UTF-8" ) );
+
+		String resultString = result.andReturn().getResponse().getContentAsString();
+
+		JacksonJsonParser jsonParser = new JacksonJsonParser();
+		return jsonParser.parseMap( resultString ).get( "access_token" ).toString();
+	}
 }
