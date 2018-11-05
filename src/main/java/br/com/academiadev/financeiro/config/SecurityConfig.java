@@ -19,7 +19,7 @@ import br.com.academiadev.financeiro.repository.UsuarioRepository;
 
 @Configuration
 @EnableAuthorizationServer
-@EnableResourceServer
+
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -39,7 +39,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-
 		web.ignoring().antMatchers( HttpMethod.GET, //
 				"/", //
 				"/webjars/**", //
@@ -56,15 +55,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				"/**/*.js"//
 		);
 
-	}
-
-	@Override
-	public void configure(HttpSecurity http) throws Exception {
-		http.antMatcher( "/**" )
-				.authorizeRequests()
-				.antMatchers( "/", "/oauth**", "/webjars/**", "/error**", "/usuario" ).permitAll()
-				.anyRequest()
-				.authenticated();
 	}
 
 	@Bean

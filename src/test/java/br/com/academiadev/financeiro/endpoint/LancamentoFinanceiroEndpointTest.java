@@ -16,6 +16,7 @@ import javax.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -54,7 +55,7 @@ public class LancamentoFinanceiroEndpointTest {
 	@Value("${security.oauth2.client.client-secret}")
 	private String CLIENT_SECRET;
 
-	@Autowired
+	@Mock
 	private UsuarioRepository repository;
 
 	@Test
@@ -75,18 +76,20 @@ public class LancamentoFinanceiroEndpointTest {
 				.content( convertObjectToJsonBytes( usuario ) ) )
 				.andExpect( status().isOk() );
 
+		String token = getToken( "docsbruno@gmail.com", "123456" );
+
 		mvc.perform( get( "/usuario" )
-				.header( "Authorization", "Bearer " + getToken( "docsbruno@gmail.com", "123456" ) )
+				.header( "Authorization", "Bearer " + token )
 				.contentType( MediaType.APPLICATION_JSON_UTF8_VALUE ) )
 				.andExpect( status().isOk() )
-				.andExpect( jsonPath( "$", hasSize( 1 ) ) )
-				.andExpect( jsonPath( "$[0].nome", is( "Augusto da Silva" ) ) )
-				.andExpect( jsonPath( "$[0].email", is( "docsbruno@gmail.com" ) ) );
+				.andExpect( jsonPath( "$", hasSize( 2 ) ) )
+				.andExpect( jsonPath( "$[0].nome", is( "Administrador do sistema" ) ) )
+				.andExpect( jsonPath( "$[0].email", is( "admin@admin.com" ) ) );
 
 		LancamentoFinanceiro lancamentoFinanceiro = getLancamentoFinanceiro();
 
 		mvc.perform( post( "/lancamentofinanceiro" )
-				.header( "Authorization", "Bearer " + getToken( "docsbruno@gmail.com", "1234567" ) )
+				.header( "Authorization", "Bearer " + token )
 				.contentType( MediaType.APPLICATION_JSON_UTF8_VALUE )
 				.content( convertObjectToJsonBytes( lancamentoFinanceiro ) ) )
 				.andExpect( status().isOk() );

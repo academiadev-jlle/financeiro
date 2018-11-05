@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/lancamentofinanceiro")
 @Api(description = "Lançamentos Financeiros")
-public class LancamentoFinanceiroEndpoint extends ControllerAbstrata<LancamentoFinanceiroService, LancamentoFinanceiro, Long> {
+public class LancamentoFinanceiroEndpoint extends CrudControllerAbstrato<LancamentoFinanceiroService, LancamentoFinanceiro, Long> {
 
     @Autowired
     public LancamentoFinanceiroEndpoint(LancamentoFinanceiroService service) {
