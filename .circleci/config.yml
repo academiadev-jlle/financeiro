@@ -10,7 +10,7 @@ jobs:
     environment:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
-      DATABASE_URL: jdbc:postgresql://localhost:5432/thunderpets
+      DATABASE_URL: jdbc:postgresql://localhost:5432/financeiro
       DATABASE_USERNAME: postgres
       DATABASE_PASSWORD: postgres
 
@@ -21,7 +21,7 @@ jobs:
     - run: sudo apt-get install postgresql-client-9.6
     - run:
         command: |
-          psql -h localhost -U postgres -c "CREATE DATABASE thunderpets;"
+          psql -h localhost -U postgres -c "CREATE DATABASE financeiro;"
 
     - restore_cache:
         keys:
