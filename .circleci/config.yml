@@ -10,17 +10,18 @@ jobs:
     environment:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
-      DATABASE_URL: jdbc:postgresql://localhost:5432/financeiro_test
-      DATABASE_USERNAME: postgre
-      DATABASE_PASSWORD: postgre
+      DATABASE_URL: jdbc:postgresql://localhost:5432/thunderpets
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
 
     steps:
-      - checkout
-      - run: sudo apt-get update
-      - run: sudo apt-get install postgresql-client-9.6
-      - run:
+    - checkout
+
+    - run: sudo apt-get update
+    - run: sudo apt-get install postgresql-client-9.6
+    - run:
         command: |
-          psql -h localhost -U postgres -c "CREATE DATABASE financeiro_test;"
+          psql -h localhost -U postgres -c "CREATE DATABASE thunderpets;"
 
     - restore_cache:
         keys:
