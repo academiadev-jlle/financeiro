@@ -15,12 +15,12 @@ jobs:
       DATABASE_PASSWORD: postgre
 
     steps:
-    - checkout
-    - run: sudo apt-get update
-    - run: sudo apt-get install postgresql-client-9.6
-    - run:
-      command: |
-        psql -h localhost -U postgres -c "CREATE DATABASE financeiro_test;"
+      - checkout
+      - run: sudo apt-get update
+      - run: sudo apt-get install postgresql-client-9.6
+      - run:
+        command: |
+          psql -h localhost -U postgres -c "CREATE DATABASE financeiro_test;"
 
     - restore_cache:
         keys:
