@@ -1,0 +1,2 @@
+-- INSERT INTO usuario (id, created_at, updated_at, email, nome, senha)
+-- VALUES (hiber.nextval(), '2018-01-01', '2018-01-01', 'admin@admin.com', 'Administrador', 'adminadmin');
