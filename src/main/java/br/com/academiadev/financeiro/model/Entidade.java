@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
@@ -13,7 +14,7 @@ import javax.persistence.MappedSuperclass;
 public class Entidade<ID> implements EntidadeAbstrata<ID> {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(example = "1", name = "Identificador")
     protected ID id;
 
